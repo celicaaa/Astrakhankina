@@ -13,6 +13,15 @@ struct Pipe {
 
 };
 
+struct Stantion{
+
+    string ks_name = "None";
+    int ks_all_cex = 0;
+    int ks_act_cex = 0;
+    int ks_effect = 0;
+
+};
+
 int check_int(int& int_data)
 
 {
@@ -23,6 +32,20 @@ int check_int(int& int_data)
         cin.clear();
         cin.ignore(100000, '\n');
         cout << "\nPlease, enter an int type > 0\n";
+        cin >> int_data;
+    }
+    return int_data;
+}
+int check_effect(int& int_data)
+
+{
+    cin >> int_data;
+    while (cin.fail() || cin.peek() != '\n' || int_data> 5 || int_data<0)
+
+    {
+        cin.clear();
+        cin.ignore(100000, '\n');
+        cout << "\nPlease, enter an int type from 0 to 5\n";
         cin >> int_data;
     }
     return int_data;
@@ -94,19 +117,55 @@ void PrintAddPipe(Pipe& new_pipe)
             << "\tDiameter: " << new_pipe.diameter << "\tRepair: " << new_pipe.remont << endl;
     }
 }
+Stantion AddStantion()
+{
 
+    Stantion new_stantion;
+    cout << endl << "Adding a new KS..." << endl;
+    cout << "Enter the name of the ks: ";
+    cin >> new_stantion.ks_name;
+
+    cout << "Enter the all cex of the ks: ";
+    check_int(new_stantion.ks_all_cex);
+
+    cout << "Enter the active cex of the ks: ";
+    check_int(new_stantion.ks_act_cex);
+
+    cout << "Enter the effect status: ";
+    check_effect(new_stantion.ks_effect);
+
+    return new_stantion;
+
+}
+
+void PrintAddStantion(Stantion& new_stantion)
+
+{
+    cout << endl << "Info about your ks..." << endl;
+    if (new_stantion.ks_name == "None")
+    {
+        cout << "No ks available!\n";
+    }
+    else
+    {
+        cout << "Name: " << new_stantion.ks_name << "\tAll cex: " << new_stantion.ks_all_cex
+
+            << "\tActive cex: " << new_stantion.ks_act_cex << "\tEffect status: " << new_stantion.ks_effect << endl;
+    }
+}
 
 int main()
 {   
     Pipe pipe0;
+    Stantion stantion0;
     int n;
     while (true) {
         cout << endl << "Menu:" << endl;
         cout << "1 Add pipe" << endl;
-        cout << "2 Add CS" << endl;
+        cout << "2 Add ks" << endl;
         cout << "3 View all objects" << endl;
         cout << "4 Edit pipe" << endl;
-        cout << "5 Edit CS" << endl;
+        cout << "5 Edit ks" << endl;
         cout << "6 Save" << endl;
         cout << "7 Download" << endl;
         cout << "0 Exit" << endl;
@@ -131,7 +190,8 @@ int main()
         }
         case 2: //add cs
         {
-            cout << "iwed" << endl;
+            stantion0 = AddStantion();
+            PrintAddStantion(stantion0);
             break;
         }
         case 3: //edit pipe
