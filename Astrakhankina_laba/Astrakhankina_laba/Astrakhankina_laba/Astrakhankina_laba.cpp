@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 using namespace std;
 struct Pipe {
 
@@ -22,159 +23,149 @@ struct Stantion{
 
 };
 
-int check_int(int& int_data)
-
-{
-    cin >> int_data;
-    while (cin.fail() || cin.peek() != '\n' || int_data <= 0)
-
-    {
+void inputInt(int& value) {
+    cin >> value;
+    while (cin.fail() || cin.peek() != '\n' || value <= 0) {
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout << "\nPlease, enter a positive integer type\n";
+        cin >> value;
+    }
+}
+void inputEffect(int& value){
+    cin >> value;
+    while (cin.fail() || cin.peek() != '\n' || value> 5 || value<0){
         cin.clear();
         cin.ignore(100000, '\n');
-        cout << "\nPlease, enter an int type > 0\n";
-        cin >> int_data;
+        cout << "\nPlease, enter an integer type from 0 to 5\n";
+        cin >> value;
     }
-    return int_data;
 }
-int check_effect(int& int_data)
-
-{
-    cin >> int_data;
-    while (cin.fail() || cin.peek() != '\n' || int_data> 5 || int_data<0)
-
-    {
+void inputDouble(double& value) {
+    cin >> value;
+    while (cin.fail() || cin.peek() != '\n' || value <= 0) {
         cin.clear();
-        cin.ignore(100000, '\n');
-        cout << "\nPlease, enter an int type from 0 to 5\n";
-        cin >> int_data;
+        cin.ignore(10000, '\n');
+        cout << "\nPlease, enter a positive double type\n";
+        cin >> value;
     }
-    return int_data;
 }
-double check_double(double& double_data)
-{
-    cin >> double_data;
-    while (cin.fail() || cin.peek() != '\n' || double_data <= 0)
-
-    {
+void inputBool(bool& value) {
+    cin >> value;
+    while (cin.fail() || cin.peek() != '\n') {
         cin.clear();
-        cin.ignore(100000, '\n');
-        cout << "\nPlease, enter a double type > 0\n";
-        cin >> double_data;
-
+        cin.ignore(10000, '\n');
+        cout << "\nPlease, enter a boolean type (0 or 1)\n";
+        cin >> value;
     }
-    return double_data;
-
 }
 
-bool check_bool(bool& bool_data)
+Pipe createPipe()
 
 {
-    cin >> bool_data;
-    while (cin.fail() || cin.peek() != '\n')
-    {
-        cin.clear();
-        cin.ignore(100000, '\n');
-        cout << "\nPlease, enter a bool type\n";
-        cin >> bool_data;
-
-    }
-    return bool_data;
-}
-Pipe AddPipe()
-
-{
-
-    Pipe new_pipe;
-    cout << endl << "Adding a new pipe..." << endl;
+    Pipe newPipe;
     cout << "Enter the name of the pipe: ";
-    cin>>new_pipe.name;
-
+    cin >> newPipe.name;
     cout << "Enter the length of the pipe: ";
-    check_double(new_pipe.length);
-
-    cout << "Enter the pipe diameter: ";
-    check_int(new_pipe.diameter);
-
-    cout << "Enter the repair status: ";
-    check_bool(new_pipe.remont);
-
-    return new_pipe;
+    inputDouble(newPipe.length);
+    cout << "Enter the diameter of the pipe: ";
+    inputInt(newPipe.diameter);
+    cout << "Does the pipe need repair? (0 for No, 1 for Yes): ";
+    inputBool(newPipe.remont);
+    return newPipe;
 
 }
 
-void PrintAddPipe(Pipe& new_pipe)
-
-{
-    cout << endl << "Info about your pipe..." << endl;
-    if (new_pipe.name == "None")
-    {
-        cout << "No pipes available!\n";
-    }
-    else
-    {
-        cout << "Name: " << new_pipe.name << "\tLength: " << new_pipe.length
-
-            << "\tDiameter: " << new_pipe.diameter << "\tRepair: " << new_pipe.remont << endl;
-    }
+void displayPipe(const Pipe& pipe) {
+    cout << "\n-----------Pipe Info-----------\n"
+        << "Name: " << pipe.name << "\n"
+        << "Length: " << pipe.length << "\n"
+        << "Diameter: " << pipe.diameter << "\n"
+        << "Needs Repair: " << (pipe.remont ? "Yes" : "No") << "\n";
 }
-Stantion AddStantion()
-{
-
-    Stantion new_stantion;
-    cout << endl << "Adding a new KS..." << endl;
-    cout << "Enter the name of the ks: ";
-    cin >> new_stantion.ks_name;
-
-    cout << "Enter the all cex of the ks: ";
-    check_int(new_stantion.ks_all_cex);
-
-    cout << "Enter the active cex of the ks: ";
-    check_int(new_stantion.ks_act_cex);
-
-    cout << "Enter the effect status: ";
-    check_effect(new_stantion.ks_effect);
-
-    return new_stantion;
-
+void editRemont(Pipe& pipe) {
+    cout << "Change repair status (0 for No, 1 for Yes): ";
+    inputBool(pipe.remont);
 }
 
-void PrintAddStantion(Stantion& new_stantion)
-
-{
-    cout << endl << "Info about your ks..." << endl;
-    if (new_stantion.ks_name == "None")
-    {
-        cout << "No ks available!\n";
+Stantion createStantion(){
+    Stantion newStantion;
+    cout << "Enter the name of the station: ";
+    cin >> newStantion.ks_name;
+    cout << "Enter the number workshops: ";
+    inputInt(newStantion.ks_all_cex);
+    int act_cex;
+    while (true) {
+        cout << "Enter the number of operating workshops: ";
+        inputInt(act_cex);
+        if (act_cex <= newStantion.ks_all_cex) {
+            newStantion.ks_act_cex = act_cex;
+            break;
+        }
+        else {
+            cout << "\nThe number of operating workshops cannot exceed the total number of workshops\n";
+        }
     }
-    else
-    {
-        cout << "Name: " << new_stantion.ks_name << "\tAll cex: " << new_stantion.ks_all_cex
+    cout << "Enter station efficiency from 0 to 5: ";
+    inputEffect(newStantion.ks_effect);
+    return newStantion;
 
-            << "\tActive cex: " << new_stantion.ks_act_cex << "\tEffect status: " << new_stantion.ks_effect << endl;
+}
+
+void displayStantion(const Stantion& ks) {
+    cout << "\n-----------Station Info-----------\n"
+        << "Name: " << ks.ks_name << "\n"
+        << "Number workshops: " << ks.ks_all_cex << "\n"
+        << "Number of operating workshops: " << ks.ks_act_cex << "\n"
+        << "Station efficiency: " 
+        << (ks.ks_effect == 0 ? "not working"
+            : ks.ks_effect == 1 ? "low efficiency"
+            : ks.ks_effect == 2 ? "medium efficiency"
+            : ks.ks_effect == 3 ? "high efficiency"
+            : ks.ks_effect == 4 ? "very high efficiency"
+            : ks.ks_effect == 5 ? "excellent efficiency" : "")
+        << "\n";
+}
+void editCex(Stantion& ks) {
+    cout << "Change number workshops: ";
+    inputInt(ks.ks_all_cex);
+    int act_cex;
+    while (true) {
+        cout << "Change number of operating workshops: ";
+        inputInt(act_cex);
+        if (act_cex <= ks.ks_all_cex) {
+            ks.ks_act_cex = act_cex;
+            break;
+        }
+        else {
+            cout << "\nThe number of operating workshops cannot exceed the total number of workshops\n";
+        }
     }
 }
+
 
 int main()
 {   
-    Pipe pipe0;
-    Stantion stantion0;
-    int n;
+    int n = -1;
+    Pipe currentPipe;
+    Stantion currentStantion;
+
     while (true) {
-        cout << endl << "Menu:" << endl;
-        cout << "1 Add pipe" << endl;
-        cout << "2 Add ks" << endl;
-        cout << "3 View all objects" << endl;
-        cout << "4 Edit pipe" << endl;
-        cout << "5 Edit ks" << endl;
-        cout << "6 Save" << endl;
-        cout << "7 Download" << endl;
-        cout << "0 Exit" << endl;
-        cout << endl << "Enter the command number: ";
+        cout << endl << "Menu:\n";
+        cout << "1 Add pipe\n";
+        cout << "2 Add station\n";
+        cout << "3 View all objects\n";
+        cout << "4 Edit pipe\n";
+        cout << "5 Edit station\n";
+        cout << "6 Save\n";
+        cout << "7 Download\n";
+        cout << "0 Exit\n";
+        cout << "\nEnter the command number: ";
         cin >> n;
 
         if (cin.fail() || n < 0 || n > 7)
         {
-            cout << "Not found this command" << endl;
+            cout << "Invalid choice. Please try again. \n" ;
             cin.clear();
             cin.ignore(1000, '\n');
             continue;
@@ -184,29 +175,34 @@ int main()
         {
         case 1: //add pipe
         {
-            pipe0 = AddPipe();
-            PrintAddPipe(pipe0);
+            currentPipe = createPipe();
+            displayPipe(currentPipe);
             break;
         }
-        case 2: //add cs
+        case 2: //add ks
         {
-            stantion0 = AddStantion();
-            PrintAddStantion(stantion0);
+            currentStantion = createStantion();
+            displayStantion(currentStantion);
             break;
         }
-        case 3: //edit pipe
+        case 3: //view all
         {
-            cout << "jdku" << endl;
+            displayPipe(currentPipe);
+            displayStantion(currentStantion);
             break;
         }
-        case 4: //edit cs
+        case 4: //edit pipe
         {
-            cout << "jeiw" << endl;
+            editRemont(currentPipe);
+            cout << "\nChanges saved\n";
+            displayPipe(currentPipe);
             break;
         }
-        case 5: 
+        case 5: //edit ks
         {
-            cout << "slwo" << endl;
+            editCex(currentStantion);
+            cout << "\nChanges saved\n";
+            displayStantion(currentStantion);
             break;
         }
         case 6: //save
@@ -221,7 +217,8 @@ int main()
         }
         case 0: //exit
         {
-            cout << "slwo" << endl;
+            cout << "exit..........." << endl;
+            return false;
             break;
         }
         }
