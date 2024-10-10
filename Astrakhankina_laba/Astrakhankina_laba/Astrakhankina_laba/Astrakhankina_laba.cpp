@@ -1,82 +1,70 @@
-﻿// Astrakhankina_laba.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
+﻿//
 #include <iostream>
 #include <fstream>
 #include <string>
 using namespace std;
 struct Pipe {
-
     string name = "None";
     double length = 0.0;
     int diameter = 0;
     bool remont = false;
-
 };
 
-struct Stantion{
-
+struct Station{
     string ks_name = "None";
     int ks_all_cex = 0;
     int ks_act_cex = 0;
     int ks_effect = 0;
-
 };
 
-void inputInt(int& value) {
-    cin >> value;
-    while (cin.fail() || cin.peek() != '\n' || value <= 0) {
+int inputInt(string message, int min_value, int max_value) {
+    int value;
+
+    while ((cin >> value).fail()
+        || cin.peek() != '\n'
+        || value < min_value || value > max_value)
+    {
         cin.clear();
         cin.ignore(10000, '\n');
-        cout << "\nPlease, enter a positive integer type\n";
-        cin >> value;
+        cout << message;
     }
+    return value;
 }
-void inputEffect(int& value){
-    cin >> value;
-    while (cin.fail() || cin.peek() != '\n' || value> 5 || value<0){
-        cin.clear();
-        cin.ignore(100000, '\n');
-        cout << "\nPlease, enter an integer type from 0 to 5\n";
-        cin >> value;
-    }
-}
-void inputDouble(double& value) {
-    cin >> value;
-    while (cin.fail() || cin.peek() != '\n' || value <= 0) {
+int inputDouble(string message, double min_value, double max_value) {
+    int value;
+
+    while ((cin >> value).fail()
+        || cin.peek() != '\n'
+        || value < min_value || value > max_value)
+    {
         cin.clear();
         cin.ignore(10000, '\n');
-        cout << "\nPlease, enter a positive double type\n";
-        cin >> value;
+        cout << message;
     }
+    return value;
 }
-void inputBool(bool& value) {
-    cin >> value;
-    while (cin.fail() || cin.peek() != '\n') {
-        cin.clear();
-        cin.ignore(10000, '\n');
-        cout << "\nPlease, enter a boolean type (0 or 1)\n";
-        cin >> value;
-    }
+ bool isValidName(const string& name) {
+    return name != "None";
 }
 
-Pipe createPipe()
-
-{
+ //----------------------------------------------------------------------------------------
+Pipe createPipe(){
     Pipe newPipe;
     cout << "Enter the name of the pipe: ";
-    cin >> newPipe.name;
+    cin >> ws;
+    getline(cin, newPipe.name);
     cout << "Enter the length of the pipe: ";
-    inputDouble(newPipe.length);
+    newPipe.length = inputDouble("\nPlease, enter a positive double type\n",0,10000);
     cout << "Enter the diameter of the pipe: ";
-    inputInt(newPipe.diameter);
+    newPipe.diameter = inputInt("\nPlease, enter a positive integer type\n", 1, 10000);
     cout << "Does the pipe need repair? (0 for No, 1 for Yes): ";
-    inputBool(newPipe.remont);
+    newPipe.remont=inputInt("\nPlease, enter a boolean type (0 or 1)\n",0,1);
     return newPipe;
-
 }
-
 void displayPipe(const Pipe& pipe) {
+    if (!isValidName(pipe.name)) {
+        return;
+    }
     cout << "\n-----------Pipe Info-----------\n"
         << "Name: " << pipe.name << "\n"
         << "Length: " << pipe.length << "\n"
@@ -84,22 +72,45 @@ void displayPipe(const Pipe& pipe) {
         << "Needs Repair: " << (pipe.remont ? "Yes" : "No") << "\n";
 }
 void editRemont(Pipe& pipe) {
+    if (!isValidName(pipe.name)) {
+        cout << "\nNo data to change\n";
+        return;
+    }
     cout << "Change repair status (0 for No, 1 for Yes): ";
-    inputBool(pipe.remont);
+    pipe.remont = inputInt("\nPlease, enter a boolean type (0 or 1)\n", 0, 1);
+    cout << "\nChanges saved\n";
 }
-
-Stantion createStantion(){
-    Stantion newStantion;
+void writePipeToFile( ofstream& out, Pipe& pipe) {
+    if (!isValidName(pipe.name)) {
+        cout << "\nNo data to record pipe\n";
+        out.close();
+        return;
+    }
+    out << "-----------Pipe Info-----------\n"
+        << pipe.name << "\n"
+        << pipe.length << "\n"
+        << pipe.diameter << "\n"
+        << pipe.remont << "\n";
+    cout << "Pipe writing to file completed...\n";
+}
+void readPipeFromFile(ifstream& in,Pipe& pipe) {
+    getline(in, pipe.name);
+    in >> pipe.diameter;
+    in >> pipe.length;
+    in >> pipe.remont;
+}
+//-------------------------------------------------------------------------------------------------
+Station createStation(){
+    Station newStation;
     cout << "Enter the name of the station: ";
-    cin >> newStantion.ks_name;
+    cin >> ws;
+    getline(cin, newStation.ks_name);
     cout << "Enter the number workshops: ";
-    inputInt(newStantion.ks_all_cex);
-    int act_cex;
+    newStation.ks_all_cex=inputInt("\nPlease, enter a possitive integer type\n",0,10000);
     while (true) {
         cout << "Enter the number of operating workshops: ";
-        inputInt(act_cex);
-        if (act_cex <= newStantion.ks_all_cex) {
-            newStantion.ks_act_cex = act_cex;
+        newStation.ks_act_cex = inputInt("\nPlease, enter a possitive integer type\n", 0, 10000);
+        if (newStation.ks_act_cex <= newStation.ks_all_cex) {
             break;
         }
         else {
@@ -107,12 +118,14 @@ Stantion createStantion(){
         }
     }
     cout << "Enter station efficiency from 0 to 5: ";
-    inputEffect(newStantion.ks_effect);
-    return newStantion;
+    newStation.ks_effect=inputInt("\nPlease, enter a possitive integer type from 0 to 5\n",0,5);
+    return newStation;
 
 }
-
-void displayStantion(const Stantion& ks) {
+void displayStation(const Station& ks) {
+    if (!isValidName(ks.ks_name)) {
+        return;
+    }
     cout << "\n-----------Station Info-----------\n"
         << "Name: " << ks.ks_name << "\n"
         << "Number workshops: " << ks.ks_all_cex << "\n"
@@ -126,13 +139,17 @@ void displayStantion(const Stantion& ks) {
             : ks.ks_effect == 5 ? "excellent efficiency" : "")
         << "\n";
 }
-void editCex(Stantion& ks) {
+void editCex(Station& ks) {
+    if (!isValidName(ks.ks_name)) {
+        cout << "\nNo data to change\n";
+        return;
+    }
     cout << "Change number workshops: ";
-    inputInt(ks.ks_all_cex);
+    ks.ks_all_cex=inputInt("\nPlease, enter a possitive integer type\n", 0, 10000);
     int act_cex;
     while (true) {
         cout << "Change number of operating workshops: ";
-        inputInt(act_cex);
+        act_cex = inputInt("\nPlease, enter a possitive integer type\n", 0, 10000);
         if (act_cex <= ks.ks_all_cex) {
             ks.ks_act_cex = act_cex;
             break;
@@ -141,14 +158,61 @@ void editCex(Stantion& ks) {
             cout << "\nThe number of operating workshops cannot exceed the total number of workshops\n";
         }
     }
+    cout << "\nChanges saved\n";
 }
+void writeStationToFile(ofstream&out, Station& ks) {
+    if (!isValidName(ks.ks_name)) {
+        cout << "\nNo data to record station\n";
+        out.close();
+        return;
+    }
+    out << "-----------Station Info-----------\n"
+        << ks.ks_name << "\n"
+        << ks.ks_all_cex << "\n"
+        << ks.ks_act_cex << "\n"
+        << ks.ks_effect << "\n";
+    cout << "Station writing to file completed...\n";
+}
+void readStationFromFile(ifstream& in, Station& ks) {
+    getline(in, ks.ks_name);
+    in >> ks.ks_all_cex;
+    in >> ks.ks_act_cex;
+    in >> ks.ks_effect;
+}
+void readAll(ifstream& in, Pipe& pipe, Station& ks){
+    string str;
+    bool pipeRead = false;
+    bool stationRead = false;
 
-
+    while (getline(in, str)) {
+        if (str == "-----------Pipe Info-----------") {
+            readPipeFromFile(in, pipe);
+            pipeRead = true;
+            cout << "Data about pipe added\n" << endl;
+        }
+        else if (str == "-----------Station Info-----------") {
+            readStationFromFile(in, ks);
+            stationRead = true;
+            cout << "Data about station added\n" << endl;
+        }
+        /*else {
+            return;
+        }*/
+    }
+    if (!pipeRead) {
+        cout << "No pipe information found in the file.\n";
+    }
+    if (!stationRead) {
+        cout << "No station information found in the file.\n";
+    }
+}
+//--------------------------------------------------------------------------------------------------
 int main()
 {   
     int n = -1;
     Pipe currentPipe;
-    Stantion currentStantion;
+    Station currentStation;
+    string file = "pipe and station.txt";
 
     while (true) {
         cout << endl << "Menu:\n";
@@ -163,8 +227,7 @@ int main()
         cout << "\nEnter the command number: ";
         cin >> n;
 
-        if (cin.fail() || n < 0 || n > 7)
-        {
+        if (cin.fail() || n < 0 || n > 7){
             cout << "Invalid choice. Please try again. \n" ;
             cin.clear();
             cin.ignore(1000, '\n');
@@ -181,38 +244,47 @@ int main()
         }
         case 2: //add ks
         {
-            currentStantion = createStantion();
-            displayStantion(currentStantion);
+            currentStation = createStation();
+            displayStation(currentStation);
             break;
         }
         case 3: //view all
         {
             displayPipe(currentPipe);
-            displayStantion(currentStantion);
+            displayStation(currentStation);
             break;
         }
         case 4: //edit pipe
         {
             editRemont(currentPipe);
-            cout << "\nChanges saved\n";
             displayPipe(currentPipe);
             break;
         }
         case 5: //edit ks
         {
-            editCex(currentStantion);
-            cout << "\nChanges saved\n";
-            displayStantion(currentStantion);
+            editCex(currentStation);
+            displayStation(currentStation);
             break;
         }
-        case 6: //save
+        case 6: //write
         {
-            cout << "slwo" << endl;
+            ofstream out;
+            out.open(file, ios::out);
+            if (out.is_open()) {
+                writePipeToFile(out, currentPipe);
+                writeStationToFile(out, currentStation);
+                out.close();
+            }
             break;
         }
-        case 7: 
+        case 7://read
         {
-            cout << "slwo" << endl;
+            ifstream in;
+            in.open(file, ios::in);
+            if (in.is_open()){
+                readAll(in, currentPipe, currentStation);
+                in.close();
+            }
             break;
         }
         case 0: //exit
@@ -225,5 +297,3 @@ int main()
     }
     return 0;
 }
-
-
